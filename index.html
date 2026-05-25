@@ -1,0 +1,940 @@
+<!DOCTYPE html>
+<html lang="es" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Extractor Universal de Seguidores Pro</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap');
+        
+        :root {
+            font-family: 'Outfit', sans-serif;
+        }
+
+        /* Temas Dinámicos de Fondo */
+        body {
+            color: #f8fafc;
+            overflow-x: hidden;
+            transition: background-color 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .bg-theme-all { background-color: #0B0F19; } /* Dark Default */
+        .bg-theme-ig  { background-color: #1f0d16; } /* Dark Magenta/Pink */
+        .bg-theme-tk  { background-color: #0a171a; } /* Dark Cyan */
+        .bg-theme-fb  { background-color: #0c1424; } /* Dark Blue */
+
+        /* Animated Background Blobs */
+        .bg-shape {
+            position: absolute;
+            filter: blur(80px);
+            opacity: 0.3;
+            animation: float 12s infinite alternate ease-in-out;
+            will-change: transform;
+        }
+        .shape-1 { top: -10%; left: -10%; width: 500px; height: 500px; background: radial-gradient(circle, rgba(99,102,241,0.4) 0%, rgba(168,85,247,0) 70%); }
+        .shape-2 { bottom: -10%; right: -10%; width: 600px; height: 600px; background: radial-gradient(circle, rgba(236,72,153,0.3) 0%, rgba(244,63,94,0) 70%); animation-delay: -5s; }
+        .shape-3 { top: 40%; left: 50%; width: 400px; height: 400px; background: radial-gradient(circle, rgba(6,182,212,0.3) 0%, rgba(56,189,248,0) 70%); animation-delay: -2s; transform: translate(-50%, -50%); }
+
+        @keyframes float {
+            0% { transform: translate(0, 0) rotate(0deg) scale(1); }
+            50% { transform: translate(30px, -40px) rotate(15deg) scale(1.05); }
+            100% { transform: translate(-30px, 30px) rotate(-15deg) scale(0.95); }
+        }
+
+        /* Parallax Container Styles */
+        .parallax-layer {
+            transition: transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+            will-change: transform;
+        }
+
+        /* Glassmorphism Panels */
+        .glass-panel {
+            background: rgba(15, 23, 42, 0.4);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        /* Gradients */
+        .text-gradient {
+            background: linear-gradient(to right, #818cf8, #c084fc, #f472b6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .icon-gradient {
+            background: linear-gradient(135deg, #6366f1 0%, #ec4899 100%);
+        }
+
+        /* Continuous Logo Animation */
+        .logo-anim {
+            animation: logoPulse 4s infinite ease-in-out;
+        }
+        @keyframes logoPulse {
+            0% { transform: translateY(0px); box-shadow: 0 0 15px rgba(99, 102, 241, 0.4); }
+            50% { transform: translateY(-4px); box-shadow: 0 10px 25px rgba(236, 72, 153, 0.6); }
+            100% { transform: translateY(0px); box-shadow: 0 0 15px rgba(99, 102, 241, 0.4); }
+        }
+
+        /* Custom Animations */
+        .fade-in-up {
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+        .delay-100 { animation-delay: 100ms; }
+        .delay-200 { animation-delay: 200ms; }
+
+        @keyframes fadeInUp {
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .pulse-border {
+            animation: borderPulse 2.5s infinite;
+        }
+        @keyframes borderPulse {
+            0% { border-color: rgba(99, 102, 241, 0.3); }
+            50% { border-color: rgba(99, 102, 241, 0.8); box-shadow: 0 0 20px rgba(99,102,241,0.2); }
+            100% { border-color: rgba(99, 102, 241, 0.3); }
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: rgba(15, 23, 42, 0.5); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb { background: rgba(99, 102, 241, 0.5); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(99, 102, 241, 0.8); }
+
+        /* Tabs styling */
+        .tab-active {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.2);
+            color: #fff;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+        }
+        .tab-inactive {
+            color: #94a3b8;
+            border-color: transparent;
+        }
+        .tab-inactive:hover {
+            color: #e2e8f0;
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+    </style>
+</head>
+<body class="min-h-screen flex flex-col relative antialiased bg-theme-all" id="mainBody">
+
+    <!-- Background Interactive Parallax Shapes -->
+    <div id="parallax-bg" class="fixed inset-0 z-[-1] pointer-events-none overflow-hidden">
+        <div class="parallax-layer w-full h-full absolute" data-speed="-0.8">
+            <div class="shape-1 bg-shape"></div>
+        </div>
+        <div class="parallax-layer w-full h-full absolute" data-speed="1.2">
+            <div class="shape-2 bg-shape"></div>
+        </div>
+        <div class="parallax-layer w-full h-full absolute" data-speed="-0.4">
+            <div class="shape-3 bg-shape"></div>
+        </div>
+    </div>
+
+    <!-- Top Navigation -->
+    <nav class="sticky top-0 z-50 glass-panel border-b-0 border-white/5">
+        <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+            <div class="flex items-center gap-4">
+                <!-- Logo with continuous animation -->
+                <div class="icon-gradient p-2.5 rounded-xl flex items-center justify-center logo-anim relative">
+                    <div class="absolute inset-0 bg-white/20 rounded-xl blur-sm mix-blend-overlay"></div>
+                    <svg class="w-6 h-6 text-white relative z-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                </div>
+                <div>
+                    <h1 class="text-xl font-extrabold tracking-tight">Social<span class="text-gradient">Extractor</span> Pro</h1>
+                </div>
+            </div>
+            <div class="hidden sm:flex items-center gap-3">
+                <span class="relative flex h-3 w-3">
+                  <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                  <span class="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span>
+                </span>
+                <span class="text-xs font-medium text-slate-300">Sistema Local Activo</span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Workspace -->
+    <main class="flex-grow max-w-7xl w-full mx-auto px-4 py-10 relative z-10">
+        
+        <!-- Upload & Guide Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 mb-12">
+            
+            <!-- Left Column: Uploader -->
+            <div class="lg:col-span-7 flex flex-col gap-6 fade-in-up">
+                <div class="glass-panel p-8 rounded-3xl relative overflow-hidden group transition-all">
+                    <div class="absolute inset-0 bg-gradient-to-br from-indigo-500/5 to-purple-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                    
+                    <div class="flex justify-between items-start relative z-10 mb-2">
+                        <h2 class="text-2xl font-bold text-white">Sube tus documentos</h2>
+                        <span class="px-3 py-1 bg-indigo-500/20 text-indigo-300 text-xs font-bold rounded-full border border-indigo-500/30">Lote Multired</span>
+                    </div>
+                    <p class="text-slate-400 text-sm mb-6 relative z-10">Selecciona o arrastra <strong>hasta 3 archivos a la vez</strong> (IG, TikTok, FB). Analizaremos todos en un solo clic.</p>
+
+                    <!-- Dropzone -->
+                    <div id="dropzone" class="relative z-10 border-2 border-dashed border-slate-600 rounded-2xl p-8 text-center cursor-pointer transition-all duration-300 hover:bg-slate-800/50 hover:border-indigo-400 pulse-border bg-slate-900/40">
+                        <input type="file" id="fileInput" class="hidden" accept=".txt,.html" multiple>
+                        
+                        <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-slate-800 flex items-center justify-center group-hover:scale-110 transition-transform duration-500 shadow-xl border border-white/5">
+                            <svg class="w-8 h-8 text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                            </svg>
+                        </div>
+                        
+                        <h3 class="text-md font-semibold text-slate-200 mb-1">Arrastra tus archivos aquí</h3>
+                        <p class="text-xs text-slate-500 mb-4">Formatos: .TXT, .HTML</p>
+                        
+                        <div class="flex flex-wrap justify-center items-center gap-3">
+                            <span class="flex items-center gap-1 px-2.5 py-1 bg-pink-500/10 border border-pink-500/20 text-pink-400 rounded-md text-[10px] font-bold uppercase tracking-wider">Instagram</span>
+                            <span class="flex items-center gap-1 px-2.5 py-1 bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 rounded-md text-[10px] font-bold uppercase tracking-wider">TikTok</span>
+                            <span class="flex items-center gap-1 px-2.5 py-1 bg-blue-600/10 border border-blue-500/20 text-blue-400 rounded-md text-[10px] font-bold uppercase tracking-wider">Facebook</span>
+                        </div>
+                    </div>
+
+                    <!-- Staged Files Area (Hidden Initially) -->
+                    <div id="stagedFilesContainer" class="hidden relative z-10 mt-6">
+                        <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">Archivos Listos para Procesar:</h4>
+                        <ul id="stagedFilesList" class="space-y-2 mb-4">
+                            <!-- Files injected here -->
+                        </ul>
+                        <button id="btnProcessFiles" class="w-full py-3.5 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-bold rounded-xl shadow-lg shadow-indigo-600/30 transform transition-all active:scale-[0.98] flex justify-center items-center gap-2">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
+                            Procesar Todo Ahora
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Right Column: Interactive Guide -->
+            <div class="lg:col-span-5 fade-in-up delay-100">
+                <div class="glass-panel p-8 rounded-3xl h-full border-t-4 border-t-indigo-500">
+                    <div class="flex items-center gap-3 mb-6">
+                        <div class="p-2 bg-indigo-500/20 rounded-lg text-indigo-400">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                        </div>
+                        <h3 class="text-xl font-bold text-white">Guía Rápida</h3>
+                    </div>
+                    <div class="space-y-6 relative">
+                        <!-- Pasos simplificados -->
+                        <div class="flex gap-4 relative step-item group">
+                            <div class="step-line relative z-10 flex-shrink-0 w-8 h-8 rounded-full bg-slate-800 border border-slate-600 flex items-center justify-center text-sm font-bold text-slate-300">1</div>
+                            <div class="pt-1">
+                                <h4 class="text-sm font-semibold text-white mb-1">Abre tu lista y haz scroll</h4>
+                                <p class="text-xs text-slate-400">Ve a tus seguidores en PC y baja hasta cargar a todos.</p>
+                            </div>
+                        </div>
+                        <div class="flex gap-4 relative step-item group">
+                            <div class="step-line relative z-10 flex-shrink-0 w-8 h-8 rounded-full bg-slate-800 border border-slate-600 flex items-center justify-center text-sm font-bold text-slate-300">2</div>
+                            <div class="pt-1">
+                                <h4 class="text-sm font-semibold text-white mb-1">Inspecciona <span class="text-indigo-400 bg-indigo-500/10 px-1 rounded">F12</span></h4>
+                                <p class="text-xs text-slate-400">Abre el inspector de código en tu navegador.</p>
+                            </div>
+                        </div>
+                        <div class="flex gap-4 relative step-item group">
+                            <div class="step-line relative z-10 flex-shrink-0 w-8 h-8 rounded-full bg-slate-800 border border-slate-600 flex items-center justify-center text-sm font-bold text-slate-300">3</div>
+                            <div class="pt-1">
+                                <h4 class="text-sm font-semibold text-white mb-1">Copia el elemento</h4>
+                                <p class="text-xs text-slate-400">Busca el <code>&lt;div&gt;</code> que cubre la lista. Clic derecho → Copy → Copy element.</p>
+                            </div>
+                        </div>
+                        <div class="flex gap-4 relative step-item group">
+                            <div class="relative z-10 flex-shrink-0 w-8 h-8 rounded-full bg-slate-800 border border-slate-600 flex items-center justify-center text-sm font-bold text-slate-300">4</div>
+                            <div class="pt-1">
+                                <h4 class="text-sm font-semibold text-emerald-400 mb-1">Guarda y Sube</h4>
+                                <p class="text-xs text-slate-400">Pega todo en un Bloc de Notas (.txt) y arrástralo a la izquierda.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Dynamic States: Loading -->
+        <div id="loadingState" class="hidden glass-panel p-16 text-center rounded-3xl mb-12 transform transition-all border-indigo-500/30">
+            <div class="relative w-24 h-24 mx-auto mb-6">
+                <div class="absolute inset-0 border-4 border-slate-700 rounded-full"></div>
+                <div class="absolute inset-0 border-4 border-indigo-500 rounded-full border-t-transparent animate-spin"></div>
+                <div class="absolute inset-0 flex items-center justify-center text-indigo-400">
+                    <svg class="w-8 h-8 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/></svg>
+                </div>
+            </div>
+            <h3 class="text-xl font-bold text-white mb-2">Procesando y combinando datos...</h3>
+            <p class="text-slate-400 text-sm">Nuestra IA está identificando las plataformas y estructurando los perfiles.</p>
+        </div>
+
+        <!-- Dynamic States: Results Section -->
+        <div id="resultsSection" class="hidden fade-in-up delay-200">
+            
+            <!-- Platform Switcher Tabs -->
+            <div class="flex flex-wrap items-center justify-center gap-3 mb-8" id="platformTabs">
+                <button data-filter="all" class="platform-tab tab-active px-6 py-2.5 rounded-xl text-sm font-bold border transition-all flex items-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/></svg>
+                    Todos
+                </button>
+                <button data-filter="Instagram" class="platform-tab tab-inactive px-6 py-2.5 rounded-xl text-sm font-bold border transition-all flex items-center gap-2">
+                    Instagram
+                </button>
+                <button data-filter="TikTok" class="platform-tab tab-inactive px-6 py-2.5 rounded-xl text-sm font-bold border transition-all flex items-center gap-2">
+                    TikTok
+                </button>
+                <button data-filter="Facebook" class="platform-tab tab-inactive px-6 py-2.5 rounded-xl text-sm font-bold border transition-all flex items-center gap-2">
+                    Facebook
+                </button>
+            </div>
+
+            <!-- Dashboard Stats -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+                <div class="glass-panel p-6 rounded-2xl flex flex-col justify-center relative overflow-hidden group">
+                    <div class="absolute right-0 top-0 w-24 h-24 bg-white/5 rounded-bl-full -mr-4 -mt-4 transition-transform group-hover:scale-110"></div>
+                    <p class="text-xs text-slate-400 uppercase tracking-wider font-semibold mb-1">Vista Actual</p>
+                    <div class="flex items-end gap-3">
+                        <h3 id="statPlatform" class="text-3xl font-bold text-white">Todos</h3>
+                        <div id="platformIcon" class="mb-1"></div>
+                    </div>
+                </div>
+                <div class="glass-panel p-6 rounded-2xl flex flex-col justify-center relative overflow-hidden group">
+                    <div class="absolute right-0 top-0 w-24 h-24 bg-indigo-500/10 rounded-bl-full -mr-4 -mt-4 transition-transform group-hover:scale-110"></div>
+                    <p class="text-xs text-slate-400 uppercase tracking-wider font-semibold mb-1">Total Extraídos</p>
+                    <h3 id="statTotal" class="text-4xl font-extrabold text-indigo-400">-</h3>
+                </div>
+                <div class="glass-panel p-6 rounded-2xl flex flex-col justify-center relative overflow-hidden group">
+                    <div class="absolute right-0 top-0 w-24 h-24 bg-emerald-500/10 rounded-bl-full -mr-4 -mt-4 transition-transform group-hover:scale-110"></div>
+                    <p class="text-xs text-slate-400 uppercase tracking-wider font-semibold mb-1">Con Nombre</p>
+                    <h3 id="statWithNames" class="text-4xl font-extrabold text-emerald-400">-</h3>
+                </div>
+                <div class="glass-panel p-6 rounded-2xl flex flex-col justify-center relative overflow-hidden group">
+                    <div class="absolute right-0 top-0 w-24 h-24 bg-rose-500/10 rounded-bl-full -mr-4 -mt-4 transition-transform group-hover:scale-110"></div>
+                    <p class="text-xs text-slate-400 uppercase tracking-wider font-semibold mb-1">Sin Nombre</p>
+                    <h3 id="statWithoutNames" class="text-4xl font-extrabold text-rose-400">-</h3>
+                </div>
+            </div>
+
+            <!-- Data Table Container -->
+            <div class="glass-panel rounded-3xl overflow-hidden shadow-2xl border border-white/10">
+                <!-- Toolbar -->
+                <div class="p-6 border-b border-white/5 flex flex-col md:flex-row justify-between items-center gap-4 bg-slate-900/60 backdrop-blur-md">
+                    <div class="relative w-full md:w-80">
+                        <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                            <svg class="h-5 w-5 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                        </div>
+                        <input type="text" id="tableSearch" class="block w-full pl-11 pr-4 py-2.5 border border-slate-700 rounded-xl bg-slate-950/50 text-slate-200 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm transition-all shadow-inner" placeholder="Buscar en la vista actual...">
+                    </div>
+
+                    <div class="flex items-center gap-3 w-full md:w-auto">
+                        <button id="btnCopyClipboard" class="flex-1 md:flex-none flex items-center justify-center gap-2 bg-slate-800 hover:bg-slate-700 text-white px-5 py-2.5 rounded-xl text-sm font-semibold transition-all hover:shadow-lg active:scale-95 border border-white/5">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/></svg>
+                            Copiar Vista
+                        </button>
+                        <button id="btnExportExcel" class="flex-1 md:flex-none flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-500 text-white px-6 py-2.5 rounded-xl text-sm font-bold transition-all shadow-lg shadow-emerald-900/40 hover:shadow-emerald-500/30 active:scale-95">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5l2 2h5a2 2 0 012 2v10a2 2 0 01-2 2z"/></svg>
+                            Exportar CSV
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Table Wrapper -->
+                <div class="overflow-x-auto max-h-[500px] overflow-y-auto relative">
+                    <table class="min-w-full text-left border-collapse">
+                        <thead class="sticky top-0 bg-slate-900/90 backdrop-blur-xl z-20 shadow-md">
+                            <tr>
+                                <th class="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-400 border-b border-white/5 w-16">#</th>
+                                <th class="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-400 border-b border-white/5 w-24">Red</th>
+                                <th class="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-400 border-b border-white/5">Usuario / ID</th>
+                                <th class="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-400 border-b border-white/5">Nombre Público</th>
+                                <th class="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-400 border-b border-white/5 text-right">Acción</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tableBody" class="divide-y divide-white/5 bg-slate-900/20">
+                            <!-- Rows injected by JavaScript -->
+                        </tbody>
+                    </table>
+                    
+                    <div id="tableEmptyState" class="hidden p-16 text-center">
+                        <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-slate-800 mb-4">
+                            <svg class="w-8 h-8 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                        </div>
+                        <p class="text-slate-400 font-medium">No se encontraron resultados para esta plataforma o búsqueda.</p>
+                    </div>
+                </div>
+
+                <!-- Footer Pagination -->
+                <div class="px-6 py-4 border-t border-white/5 bg-slate-900/50 flex flex-col sm:flex-row justify-between items-center gap-4 text-sm text-slate-400">
+                    <div id="paginationInfo" class="font-medium">Mostrando -- a -- de --</div>
+                    <div class="flex gap-2">
+                        <button id="btnPrevPage" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white rounded-lg transition-colors disabled:opacity-30 disabled:cursor-not-allowed flex items-center gap-1">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg> Anterior
+                        </button>
+                        <button id="btnNextPage" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white rounded-lg transition-colors disabled:opacity-30 disabled:cursor-not-allowed flex items-center gap-1">
+                            Siguiente <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Floating Action Toast -->
+        <div id="toast" class="fixed bottom-6 right-6 z-50 transform translate-y-20 opacity-0 transition-all duration-300 pointer-events-none">
+            <div class="glass-panel px-5 py-4 rounded-2xl flex items-center gap-4 shadow-2xl border-l-4" id="toastBorder">
+                <div id="toastIcon"></div>
+                <div>
+                    <h4 class="font-bold text-white text-sm" id="toastTitle">Notificación</h4>
+                    <p class="text-xs text-slate-300" id="toastMsg">Mensaje de sistema.</p>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="mt-auto border-t border-white/5 bg-slate-900/30 backdrop-blur py-8">
+        <div class="max-w-7xl mx-auto px-6 text-center flex flex-col md:flex-row items-center justify-between gap-4">
+            <p class="text-xs text-slate-500 font-medium text-left leading-relaxed">
+                © 2026 SocialExtractor Pro. Herramienta de uso local y privado.<br class="hidden sm:block">
+                Construido por <a href="https://github.com/Bryan-dev074" target="_blank" class="text-indigo-400 hover:text-pink-400 font-bold transition-colors duration-300">Bryan-dev074</a>
+            </p>
+            <div class="flex gap-4">
+                <span class="w-2 h-2 rounded-full bg-slate-700 hover:bg-indigo-500 transition-colors cursor-pointer"></span>
+                <span class="w-2 h-2 rounded-full bg-slate-700 hover:bg-pink-500 transition-colors cursor-pointer"></span>
+                <span class="w-2 h-2 rounded-full bg-slate-700 hover:bg-emerald-500 transition-colors cursor-pointer"></span>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // --- PARALLAX BACKGROUND LOGIC ---
+        document.addEventListener('mousemove', (e) => {
+            const mouseX = e.clientX;
+            const mouseY = e.clientY;
+            const moveX = (mouseX - window.innerWidth / 2) * 0.03; 
+            const moveY = (mouseY - window.innerHeight / 2) * 0.03;
+
+            document.querySelectorAll('.parallax-layer').forEach(layer => {
+                const speed = parseFloat(layer.getAttribute('data-speed'));
+                layer.style.transform = `translate(${moveX * speed}px, ${moveY * speed}px)`;
+            });
+        });
+
+        // --- STATE MANAGEMENT ---
+        let stagedFiles = [];
+        let allFollowersData = []; // Data base from all files combined
+        let currentViewData = []; // Filtered data depending on selected platform tab
+        let filteredSearchData = []; // Final data matching search query
+        
+        let currentPage = 1;
+        let activeTab = "all";
+        const rowsPerPage = 50;
+
+        // --- DOM ELEMENTS ---
+        const dropzone = document.getElementById('dropzone');
+        const fileInput = document.getElementById('fileInput');
+        const stagedFilesContainer = document.getElementById('stagedFilesContainer');
+        const stagedFilesList = document.getElementById('stagedFilesList');
+        const btnProcessFiles = document.getElementById('btnProcessFiles');
+        
+        const loadingState = document.getElementById('loadingState');
+        const resultsSection = document.getElementById('resultsSection');
+        const mainBody = document.getElementById('mainBody');
+        
+        // Stats & Tabs
+        const platformTabs = document.querySelectorAll('.platform-tab');
+        const statPlatform = document.getElementById('statPlatform');
+        const platformIcon = document.getElementById('platformIcon');
+        const statTotal = document.getElementById('statTotal');
+        const statWithNames = document.getElementById('statWithNames');
+        const statWithoutNames = document.getElementById('statWithoutNames');
+        
+        // Table
+        const tableBody = document.getElementById('tableBody');
+        const tableSearch = document.getElementById('tableSearch');
+        const tableEmptyState = document.getElementById('tableEmptyState');
+        const paginationInfo = document.getElementById('paginationInfo');
+        const btnPrevPage = document.getElementById('btnPrevPage');
+        const btnNextPage = document.getElementById('btnNextPage');
+        const btnExportExcel = document.getElementById('btnExportExcel');
+        const btnCopyClipboard = document.getElementById('btnCopyClipboard');
+
+        // --- FILE STAGING LOGIC ---
+        dropzone.addEventListener('click', () => fileInput.click());
+        ['dragenter', 'dragover'].forEach(eName => {
+            dropzone.addEventListener(eName, e => {
+                e.preventDefault(); dropzone.classList.add('border-indigo-500', 'bg-indigo-900/20');
+            });
+        });
+        ['dragleave', 'drop'].forEach(eName => {
+            dropzone.addEventListener(eName, e => {
+                e.preventDefault(); dropzone.classList.remove('border-indigo-500', 'bg-indigo-900/20');
+            });
+        });
+        
+        dropzone.addEventListener('drop', e => handleFilesSelection(e.dataTransfer.files));
+        fileInput.addEventListener('change', e => handleFilesSelection(e.target.files));
+
+        function handleFilesSelection(files) {
+            Array.from(files).forEach(file => {
+                // Prevent duplicates by name
+                if(!stagedFiles.find(f => f.name === file.name)) {
+                    if(stagedFiles.length < 5) stagedFiles.push(file); // Max 5 files to be safe
+                }
+            });
+            renderStagedFiles();
+        }
+
+        function removeStagedFile(index) {
+            stagedFiles.splice(index, 1);
+            renderStagedFiles();
+        }
+
+        function renderStagedFiles() {
+            if (stagedFiles.length === 0) {
+                stagedFilesContainer.classList.add('hidden');
+                return;
+            }
+            
+            stagedFilesContainer.classList.remove('hidden');
+            stagedFilesContainer.classList.add('fade-in-up');
+            stagedFilesList.innerHTML = '';
+            
+            stagedFiles.forEach((file, index) => {
+                const li = document.createElement('li');
+                li.className = "flex justify-between items-center bg-slate-900/80 border border-slate-700 p-3 rounded-lg";
+                
+                // Get size in KB
+                const sizeKB = (file.size / 1024).toFixed(1);
+                
+                li.innerHTML = `
+                    <div class="flex items-center gap-3 overflow-hidden">
+                        <svg class="w-5 h-5 text-indigo-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                        <div class="truncate">
+                            <p class="text-sm font-semibold text-white truncate">${file.name}</p>
+                            <p class="text-[10px] text-slate-400">${sizeKB} KB</p>
+                        </div>
+                    </div>
+                    <button onclick="removeStagedFile(${index})" class="text-slate-500 hover:text-rose-400 p-1 transition-colors">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                    </button>
+                `;
+                stagedFilesList.appendChild(li);
+            });
+        }
+
+        // --- PLATFORM DETECTION & PARSING LOGIC ---
+        function detectPlatform(html) {
+            const lower = html.toLowerCase();
+            // TikTok es evidente con sus CDN o estructura de link
+            if (lower.includes('tiktokcdn.com') || lower.includes('href="/@')) return 'TikTok';
+            
+            // PRIORIDAD INSTAGRAM: Clases clave que evitan falsos positivos de enlaces a FB
+            // "_ap3a" y "_aade" son super específicas de los spans de username en IG.
+            if (html.includes('class="_ap3a') || html.includes('class="_aade')) return 'Instagram';
+            
+            // PRIORIDAD FACEBOOK: Atributos y urls específicas
+            if (html.includes('data-mcomponent') || lower.includes('profile.php?id=') || lower.includes('fbcdn.net')) return 'Facebook';
+            
+            // Fallbacks genéricos
+            if (lower.includes('facebook.com') && !lower.includes('instagram.com')) return 'Facebook';
+            
+            // Por defecto, asumimos Instagram
+            return 'Instagram';
+        }
+
+        const readFileAsText = (file) => new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = e => resolve(e.target.result);
+            reader.onerror = e => reject(e);
+            reader.readAsText(file);
+        });
+
+        btnProcessFiles.addEventListener('click', async () => {
+            if(stagedFiles.length === 0) return;
+            
+            resultsSection.classList.add('hidden');
+            loadingState.classList.remove('hidden');
+            loadingState.classList.add('fade-in-up');
+            loadingState.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            
+            allFollowersData = []; // Reset general array
+
+            try {
+                // Artificial delay for UI UX
+                await new Promise(r => setTimeout(r, 800));
+
+                for (const file of stagedFiles) {
+                    const content = await readFileAsText(file);
+                    const platform = detectPlatform(content);
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(content, 'text/html');
+                    
+                    let extracted = [];
+                    if (platform === 'TikTok') extracted = parseTikTok(doc, content);
+                    else if (platform === 'Facebook') extracted = parseFacebook(doc, content);
+                    else extracted = parseInstagram(doc, content);
+                    
+                    allFollowersData = allFollowersData.concat(extracted);
+                }
+
+                stagedFiles = []; // Clear queue after processing
+                renderStagedFiles();
+                
+                loadingState.classList.add('hidden');
+                
+                if(allFollowersData.length === 0) {
+                    showToast("Atención", "No se encontraron seguidores en los archivos proporcionados.", "warning");
+                    return;
+                }
+
+                // Initial view is 'all'
+                switchTab('all');
+                resultsSection.classList.remove('hidden');
+                resultsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                
+                showToast("Procesamiento Completado", `Se consolidaron ${allFollowersData.length} perfiles en total.`, "success");
+
+            } catch (error) {
+                console.error(error);
+                loadingState.classList.add('hidden');
+                showToast("Error", "Ocurrió un error al leer o procesar los archivos.", "error");
+            }
+        });
+
+        // Parsers específicos...
+        function parseInstagram(doc, htmlContent) {
+            let usernameElements = doc.querySelectorAll('span._ap3a, a._ap3a, div._ap3a, span._aade');
+            const extracted = [];
+            const foundUsernames = new Set();
+
+            usernameElements.forEach(uEl => {
+                const username = uEl.textContent.trim();
+                if (!username || username.includes(' ') || foundUsernames.has(username)) return;
+
+                foundUsernames.add(username);
+                let fullName = "";
+                let current = uEl;
+                
+                for (let i = 0; i < 9; i++) {
+                    if (!current.parentElement) break;
+                    current = current.parentElement;
+                    const nameEl = current.querySelector('span.x1lliihq.x193iq5w.x6ikm8r, span.x193iq5w.x6ikm8r');
+                    if (nameEl && nameEl !== uEl) {
+                        const val = nameEl.textContent.trim();
+                        if (val && val !== username && !["Seguir", "Eliminar", "Siguiendo"].includes(val)) {
+                            fullName = val; break;
+                        }
+                    }
+                }
+                extracted.push({ username, fullName, platform: 'Instagram', url: `https://instagram.com/${username}` });
+            });
+
+            if (extracted.length === 0) {
+                const userRegex = /_ap3a[^>]*>([^<]+)<\/span>/g;
+                let match;
+                while ((match = userRegex.exec(htmlContent)) !== null) {
+                    const user = match[1].trim();
+                    if (!foundUsernames.has(user) && !user.includes(' ')) {
+                        foundUsernames.add(user);
+                        extracted.push({ username: user, fullName: "", platform: 'Instagram', url: `https://instagram.com/${user}` });
+                    }
+                }
+            }
+            return extracted;
+        }
+
+        function parseTikTok(doc, htmlContent) {
+            const extracted = [];
+            const seen = new Set();
+            const links = doc.querySelectorAll('a[href^="/@"]');
+            links.forEach(link => {
+                const href = link.getAttribute('href');
+                const username = href.replace('/@', '').split('?')[0];
+                if(!username || seen.has(username)) return;
+
+                seen.add(username);
+                let text = link.textContent.trim();
+                let fullName = (text && text !== username) ? text : "";
+
+                extracted.push({ username, fullName, url: `https://tiktok.com/@${username}`, platform: 'TikTok' });
+            });
+
+            if(extracted.length === 0) {
+                 const regex = /href="\/@([^"]+)"/g;
+                 let match;
+                 while((match = regex.exec(htmlContent)) !== null) {
+                     let u = match[1].split('?')[0];
+                     if(!seen.has(u)) {
+                         seen.add(u);
+                         extracted.push({username: u, fullName: "", url: `https://tiktok.com/@${u}`, platform: 'TikTok'});
+                     }
+                 }
+            }
+            return extracted;
+        }
+
+        function parseFacebook(doc, htmlContent) {
+            const extracted = [];
+            const seen = new Set();
+            const links = doc.querySelectorAll('a[href*="facebook.com/"], a[role="link"], a[tabindex="0"]');
+            
+            links.forEach(link => {
+                let href = link.getAttribute('href') || "";
+                let text = link.textContent.trim();
+                if(!text || text.length < 2 || text.toLowerCase().includes('seguidor') || text.toLowerCase().includes('amigo')) return;
+
+                let username = "Desconocido";
+                if(href.includes('profile.php?id=')) {
+                    username = new URLSearchParams(href.split('?')[1]).get('id') || "ID";
+                } else if(href.startsWith('/') || href.includes('facebook.com/')) {
+                    let parts = href.split('?')[0].split('/');
+                    username = parts[parts.length - 1] || parts[parts.length - 2];
+                }
+
+                const exclusions = ['groups', 'pages', 'events', 'marketplace', 'friends', 'settings', 'home', '#', ''];
+                if(!exclusions.includes(username.toLowerCase()) && !seen.has(text)) {
+                    seen.add(text);
+                    extracted.push({
+                        username: username !== "Desconocido" ? username : "N/A",
+                        fullName: text,
+                        url: href.startsWith('http') ? href : `https://facebook.com${href.startsWith('/') ? href : '/' + href}`,
+                        platform: 'Facebook'
+                    });
+                }
+            });
+
+            if (extracted.length === 0) {
+                const nameSpans = doc.querySelectorAll('span[dir="auto"], div[dir="auto"] > span, span.f2');
+                nameSpans.forEach(span => {
+                    let text = span.textContent.trim();
+                    if(text.length > 3 && text.includes(' ') && !text.toLowerCase().includes('seguidor')) {
+                        if(!seen.has(text)) {
+                            seen.add(text);
+                            extracted.push({ username: "N/A", fullName: text, url: "N/A", platform: 'Facebook' });
+                        }
+                    }
+                });
+            }
+            return extracted;
+        }
+
+        // --- UI & TAB SWITCHING LOGIC ---
+        platformTabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                const targetPlatform = tab.getAttribute('data-filter');
+                switchTab(targetPlatform);
+            });
+        });
+
+        function switchTab(platform) {
+            activeTab = platform;
+            
+            // 1. Update UI Tabs Active State
+            platformTabs.forEach(tab => {
+                if(tab.getAttribute('data-filter') === platform) {
+                    tab.classList.replace('tab-inactive', 'tab-active');
+                } else {
+                    tab.classList.replace('tab-active', 'tab-inactive');
+                }
+            });
+
+            // 2. Change Background Theme smoothly
+            mainBody.className = mainBody.className.replace(/bg-theme-[a-z]+/g, '').trim();
+            if (platform === 'Instagram') mainBody.classList.add('bg-theme-ig');
+            else if (platform === 'TikTok') mainBody.classList.add('bg-theme-tk');
+            else if (platform === 'Facebook') mainBody.classList.add('bg-theme-fb');
+            else mainBody.classList.add('bg-theme-all');
+
+            // 3. Filter Data Layer
+            if (platform === 'all') {
+                currentViewData = [...allFollowersData];
+            } else {
+                currentViewData = allFollowersData.filter(item => item.platform === platform);
+            }
+
+            // 4. Reset search & pagination
+            tableSearch.value = '';
+            filteredSearchData = [...currentViewData];
+            currentPage = 1;
+
+            updateDashboard();
+            renderTable();
+        }
+
+        function updateDashboard() {
+            // Setup title & Icon based on activeTab
+            if (activeTab === 'Instagram') {
+                statPlatform.textContent = "Instagram";
+                statPlatform.className = "text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-pink-500 to-orange-400";
+                platformIcon.innerHTML = `<span class="flex items-center justify-center w-8 h-8 rounded-full bg-pink-500/20 text-pink-400"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2-2v12a2 2 0 002 2z"/></svg></span>`;
+            } else if (activeTab === 'TikTok') {
+                statPlatform.textContent = "TikTok";
+                statPlatform.className = "text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 to-blue-500";
+                platformIcon.innerHTML = `<span class="flex items-center justify-center w-8 h-8 rounded-full bg-cyan-500/20 text-cyan-400"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"/></svg></span>`;
+            } else if (activeTab === 'Facebook') {
+                statPlatform.textContent = "Facebook";
+                statPlatform.className = "text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-indigo-500";
+                platformIcon.innerHTML = `<span class="flex items-center justify-center w-8 h-8 rounded-full bg-blue-500/20 text-blue-400"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg></span>`;
+            } else {
+                statPlatform.textContent = "Combinado";
+                statPlatform.className = "text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 to-purple-400";
+                platformIcon.innerHTML = `<span class="flex items-center justify-center w-8 h-8 rounded-full bg-indigo-500/20 text-indigo-400"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"/></svg></span>`;
+            }
+
+            const total = currentViewData.length;
+            const withNames = currentViewData.filter(f => f.fullName && f.fullName !== "").length;
+            
+            // Animating numbers
+            animateValue(statTotal, 0, total, 800);
+            animateValue(statWithNames, 0, withNames, 800);
+            animateValue(statWithoutNames, 0, total - withNames, 800);
+        }
+
+        function animateValue(obj, start, end, duration) {
+            let startTimestamp = null;
+            const step = (timestamp) => {
+                if (!startTimestamp) startTimestamp = timestamp;
+                const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+                const easeProgress = 1 - Math.pow(1 - progress, 4);
+                obj.innerHTML = Math.floor(easeProgress * (end - start) + start);
+                if (progress < 1) window.requestAnimationFrame(step);
+            };
+            window.requestAnimationFrame(step);
+        }
+
+        function renderTable() {
+            tableBody.innerHTML = '';
+            
+            if (filteredSearchData.length === 0) {
+                tableEmptyState.classList.remove('hidden');
+                paginationInfo.innerHTML = `Mostrando <span class="text-white">0</span> resultados`;
+                btnPrevPage.disabled = true; btnNextPage.disabled = true;
+                return;
+            } else {
+                tableEmptyState.classList.add('hidden');
+            }
+
+            const startIndex = (currentPage - 1) * rowsPerPage;
+            const endIndex = Math.min(startIndex + rowsPerPage, filteredSearchData.length);
+            const paginatedItems = filteredSearchData.slice(startIndex, endIndex);
+
+            const animDelays = ['delay-0', 'delay-75', 'delay-100', 'delay-150', 'delay-200'];
+
+            paginatedItems.forEach((item, index) => {
+                const globalIndex = startIndex + index + 1;
+                const tr = document.createElement('tr');
+                const staggerClass = animDelays[index % animDelays.length] || '';
+                tr.className = `hover:bg-white/5 transition-colors border-b border-white/5 fade-in-up ${staggerClass}`;
+                
+                const nameDisplay = item.fullName ? `<span class="font-medium text-slate-200">${item.fullName}</span>` : '<span class="text-slate-600 italic">No especificado</span>';
+                
+                let platBadge = '';
+                if(item.platform === 'Instagram') platBadge = '<div class="w-8 h-8 rounded-full bg-gradient-to-tr from-orange-500 to-pink-500 flex items-center justify-center shadow-lg shadow-pink-500/20 text-white font-bold text-[10px]" title="Instagram">IG</div>';
+                else if(item.platform === 'TikTok') platBadge = '<div class="w-8 h-8 rounded-full bg-slate-900 border border-cyan-500/50 flex items-center justify-center text-cyan-400 font-bold text-[10px]" title="TikTok">TK</div>';
+                else platBadge = '<div class="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center shadow-lg shadow-blue-500/20 text-white font-bold text-[10px]" title="Facebook">FB</div>';
+
+                let urlRender = item.url !== "N/A" 
+                    ? `<a href="${item.url}" target="_blank" class="inline-flex items-center justify-center px-3 py-1.5 bg-white/5 hover:bg-white/10 rounded-lg text-indigo-300 hover:text-indigo-200 font-medium transition-colors text-xs gap-1 group">Abrir <svg class="w-3 h-3 transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg></a>` 
+                    : '<span class="text-slate-600 text-sm px-3">-</span>';
+
+                tr.innerHTML = `
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-500 font-mono">${globalIndex}</td>
+                    <td class="px-6 py-4 whitespace-nowrap">${platBadge}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-white tracking-wide">${item.username !== "N/A" ? item.username : '<span class="text-slate-500 font-normal">Oculto</span>'}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm">${nameDisplay}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-right">${urlRender}</td>
+                `;
+                tableBody.appendChild(tr);
+            });
+
+            paginationInfo.innerHTML = `Mostrando <span class="text-white font-bold">${startIndex + 1}</span> a <span class="text-white font-bold">${endIndex}</span> de <span class="text-white font-bold">${filteredSearchData.length}</span>`;
+            btnPrevPage.disabled = currentPage === 1;
+            btnNextPage.disabled = endIndex >= filteredSearchData.length;
+        }
+
+        // --- SEARCH & PAGINATION ---
+        btnPrevPage.addEventListener('click', () => { if (currentPage > 1) { currentPage--; renderTable(); } });
+        btnNextPage.addEventListener('click', () => { if (currentPage * rowsPerPage < filteredSearchData.length) { currentPage++; renderTable(); } });
+
+        tableSearch.addEventListener('input', (e) => {
+            const query = e.target.value.toLowerCase().trim();
+            if (query === '') {
+                filteredSearchData = [...currentViewData];
+            } else {
+                filteredSearchData = currentViewData.filter(item => 
+                    (item.username && item.username.toLowerCase().includes(query)) || 
+                    (item.fullName && item.fullName.toLowerCase().includes(query))
+                );
+            }
+            currentPage = 1; 
+            renderTable();
+        });
+
+        // --- EXPORTS (ONLY EXPORTS WHAT'S FILTERED) ---
+        btnExportExcel.addEventListener('click', () => {
+            if (filteredSearchData.length === 0) return;
+            const headers = ["ID", "Plataforma", "Usuario/Alias", "Nombre Publico", "Enlace URL"];
+            const rows = filteredSearchData.map((item, index) => [
+                index + 1, item.platform, item.username, item.fullName || "", item.url
+            ]);
+            
+            const csvContent = "\ufeff" + [
+                headers.join(";"),
+                ...rows.map(row => row.map(val => `"${(val||"").toString().replace(/"/g, '""')}"`).join(";"))
+            ].join("\n");
+
+            const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+            const link = document.createElement("a");
+            link.href = URL.createObjectURL(blob);
+            link.download = `Reporte_${activeTab}_${new Date().toISOString().split('T')[0]}.csv`;
+            document.body.appendChild(link); link.click(); document.body.removeChild(link);
+            showToast("Exportación Lista", "El archivo Excel se descargó correctamente.", "success");
+        });
+
+        btnCopyClipboard.addEventListener('click', () => {
+            if (filteredSearchData.length === 0) return;
+            const text = filteredSearchData.map(i => `${i.username !== "N/A" ? '@'+i.username : i.fullName}${i.fullName && i.username !== "N/A" ? ' - ' + i.fullName : ''} [${i.platform}]`).join('\n');
+            const textArea = document.createElement("textarea");
+            textArea.value = text; textArea.style.position = "fixed";
+            document.body.appendChild(textArea); textArea.select();
+            try { 
+                document.execCommand('copy'); 
+                showToast("Copiado al Portapapeles", `Tienes ${filteredSearchData.length} perfiles listos para pegar.`, "success"); 
+            } catch (err) { 
+                showToast("Fallo al copiar", "Tu navegador bloqueó la acción.", "error"); 
+            }
+            document.body.removeChild(textArea);
+        });
+
+        // --- TOAST SYSTEM ---
+        function showToast(title, message, type = "success") {
+            const toast = document.getElementById('toast');
+            const toastBorder = document.getElementById('toastBorder');
+            const icon = document.getElementById('toastIcon');
+            
+            document.getElementById('toastTitle').textContent = title;
+            document.getElementById('toastMsg').textContent = message;
+            
+            if (type === "success") { 
+                toastBorder.className = "glass-panel px-5 py-4 rounded-2xl flex items-center gap-4 shadow-2xl border-l-4 border-emerald-500";
+                icon.innerHTML = `<div class="p-2 bg-emerald-500/20 text-emerald-400 rounded-full"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg></div>`; 
+            } else if (type === "warning") { 
+                toastBorder.className = "glass-panel px-5 py-4 rounded-2xl flex items-center gap-4 shadow-2xl border-l-4 border-amber-500";
+                icon.innerHTML = `<div class="p-2 bg-amber-500/20 text-amber-400 rounded-full"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg></div>`; 
+            } else { 
+                toastBorder.className = "glass-panel px-5 py-4 rounded-2xl flex items-center gap-4 shadow-2xl border-l-4 border-rose-500";
+                icon.innerHTML = `<div class="p-2 bg-rose-500/20 text-rose-400 rounded-full"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg></div>`; 
+            }
+
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            setTimeout(() => toast.classList.add('translate-y-20', 'opacity-0'), 4000);
+        }
+    </script>
+</body>
+</html>
